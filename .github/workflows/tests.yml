@@ -15,7 +15,7 @@ on:
       - workos
 
 jobs:
-  ci:
+  console:
     runs-on: ubuntu-latest
     environment: Testing
     strategy:
@@ -40,21 +40,47 @@ jobs:
 
       - name: Install Node Dependencies
         run: npm i
+        working-directory: ./console
 
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
+        working-directory: ./console
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        working-directory: ./console
 
       - name: Copy Environment File
         run: cp .env.example .env
+        working-directory: ./console
 
       - name: Generate Application Key
         run: php artisan key:generate
+        working-directory: ./console
 
       - name: Build Assets
         run: npm run build
+        working-directory: ./console
 
       - name: Run Tests
         run: ./vendor/bin/pest
+        working-directory: ./console
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Core Dependencies
+        run: npm i
+        working-directory: ./core
+
+      - name: Run Core Tests
+        run: npm test
+        working-directory: ./core
