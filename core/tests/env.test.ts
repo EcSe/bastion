@@ -25,4 +25,16 @@ describe('readEnv', () => {
     expect(env.port).toBe(8787);
     expect(env.database.port).toBe(3306);
   });
+
+  it('throws when port variables are invalid', () => {
+    expect(() => {
+      readEnv({
+        CORE_TOKEN: 'token-value',
+        DB_HOST: '127.0.0.1',
+        DB_NAME: 'bastion',
+        DB_USER: 'root',
+        PORT: 'not-a-number',
+      });
+    }).toThrow('PORT');
+  });
 });

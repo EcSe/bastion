@@ -58,12 +58,12 @@ Antes de implementar cualquier funcionalidad nueva, validar siempre:
 ## Comandos base de trabajo
 
 ### Console
-1. `cd /Users/ecse/Herd/bastion/console`
+1. `cd console`
 2. `hc install`
 3. `art test --compact`
 
 ### Core
-1. `cd /Users/ecse/Herd/bastion/core`
+1. `cd core`
 2. `npm install`
 3. `npm run dev`
 4. `npm test`

@@ -31,6 +31,25 @@ describe('health routes', () => {
     await app.close();
   });
 
+  it('rejects v1 health with an invalid bearer token', async () => {
+    const app = buildApp({
+      coreToken: 'token',
+      checkDatabaseHealth: async () => true,
+    });
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/v1/health',
+      headers: {
+        authorization: 'Bearer invalid-token',
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+
+    await app.close();
+  });
+
   it('returns degraded when database health fails', async () => {
     const app = buildApp({
       coreToken: 'token',
