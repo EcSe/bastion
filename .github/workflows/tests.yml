@@ -18,6 +18,19 @@ jobs:
   console:
     runs-on: ubuntu-latest
     environment: Testing
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: bastion_test
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -uroot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     strategy:
       matrix:
         php-version: ['8.4', '8.5']
@@ -57,6 +70,17 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
         working-directory: ./console
+
+      - name: Migrate Test Database
+        run: php artisan migrate:fresh --force
+        working-directory: ./console
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: bastion_test
+          DB_USERNAME: root
+          DB_PASSWORD: ''
 
       - name: Build Assets
         run: npm run build

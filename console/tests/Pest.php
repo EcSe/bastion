@@ -14,6 +14,9 @@
 pest()->extend(Tests\TestCase::class)
     ->in('Feature', 'Unit');
 
+pest()->use(Illuminate\Foundation\Testing\DatabaseTransactions::class)
+    ->in('Feature');
+
 /*
 |--------------------------------------------------------------------------
 | Expectations
