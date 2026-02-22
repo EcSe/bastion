@@ -15,9 +15,22 @@ on:
       - workos
 
 jobs:
-  ci:
+  console:
     runs-on: ubuntu-latest
     environment: Testing
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: bastion_test
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -uroot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     strategy:
       matrix:
         php-version: ['8.4', '8.5']
@@ -40,21 +53,58 @@ jobs:
 
       - name: Install Node Dependencies
         run: npm i
+        working-directory: ./console
 
       - name: Add Flux Credentials Loaded From ENV
         run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
+        working-directory: ./console
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        working-directory: ./console
 
       - name: Copy Environment File
         run: cp .env.example .env
+        working-directory: ./console
 
       - name: Generate Application Key
         run: php artisan key:generate
+        working-directory: ./console
+
+      - name: Migrate Test Database
+        run: php artisan migrate:fresh --force
+        working-directory: ./console
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: bastion_test
+          DB_USERNAME: root
+          DB_PASSWORD: ''
 
       - name: Build Assets
         run: npm run build
+        working-directory: ./console
 
       - name: Run Tests
         run: ./vendor/bin/pest
+        working-directory: ./console
+
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Core Dependencies
+        run: npm i
+        working-directory: ./core
+
+      - name: Run Core Tests
+        run: npm test
+        working-directory: ./core
