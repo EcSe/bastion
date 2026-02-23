@@ -6,6 +6,7 @@ use App\Models\ExecutionLog;
 use App\Models\Recipe;
 use App\Models\Target;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Schema;
 
 it('creates the bastion domain tables with expected columns', function (): void {
@@ -72,4 +73,16 @@ it('persists and resolves relationships across bastion domain models', function 
         ->and($recipe->parameters['branch']['enum'])->toContain('main')
         ->and($approval->approvedBy->is($approver))->toBeTrue()
         ->and($operator->requestedExecutions()->whereKey($execution->id)->exists())->toBeTrue();
+});
+
+it('enforces a single approval per execution', function (): void {
+    $execution = Execution::factory()->create();
+
+    Approval::factory()->create([
+        'execution_id' => $execution->id,
+    ]);
+
+    expect(fn (): \App\Models\Approval => Approval::factory()->create([
+        'execution_id' => $execution->id,
+    ]))->toThrow(QueryException::class);
 });
