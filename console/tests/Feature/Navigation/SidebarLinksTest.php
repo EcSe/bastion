@@ -11,7 +11,8 @@ it('shows targets and recipes links in the dashboard for authenticated users', f
 
     $response->assertOk()
         ->assertSee('Targets')
-        ->assertSee('Recipes');
+        ->assertSee('Recipes')
+        ->assertSee('Ejecuciones');
 });
 
 it('requires authentication for inventory routes', function (): void {
@@ -39,4 +40,7 @@ it('allows authenticated users to open inventory pages', function (): void {
     $this->actingAs($user)->get(route('recipes.index'))->assertOk();
     $this->actingAs($user)->get(route('recipes.create'))->assertOk();
     $this->actingAs($user)->get(route('recipes.edit', $recipe))->assertOk();
+
+    $this->actingAs($user)->get(route('executions.index'))->assertOk();
+    $this->actingAs($user)->get(route('executions.create'))->assertOk();
 });

@@ -28,3 +28,29 @@ it('sends bearer token to the core health endpoint', function (): void {
             && $request->hasHeader('Authorization', 'Bearer unit-test-token');
     });
 });
+
+it('sends execute payload to the core execute endpoint', function (): void {
+    config()->set('services.bastion_core.url', 'http://127.0.0.1:8787');
+    config()->set('services.bastion_core.token', 'unit-test-token');
+
+    Http::fake([
+        'http://127.0.0.1:8787/v1/execute' => Http::response([
+            'status' => 'queued',
+            'id' => 101,
+        ]),
+    ]);
+
+    $response = app(CoreClient::class)->execute(12, 34, ['branch' => 'main']);
+
+    expect($response['ok'])->toBeTrue()
+        ->and($response['body']['status'])->toBe('queued');
+
+    Http::assertSent(function (Request $request): bool {
+        return $request->url() === 'http://127.0.0.1:8787/v1/execute'
+            && $request->method() === 'POST'
+            && $request->hasHeader('Authorization', 'Bearer unit-test-token')
+            && $request->data()['recipe_id'] === 12
+            && $request->data()['target_id'] === 34
+            && $request->data()['params']['branch'] === 'main';
+    });
+});

@@ -32,12 +32,16 @@ class Form extends Component
 
     public function mount(mixed $recipe = null): void
     {
+        if ($recipe === null) {
+            return;
+        }
+
         if ($recipe instanceof Recipe) {
             $this->recipe = $recipe;
         } elseif (is_numeric($recipe)) {
             $this->recipe = Recipe::query()->findOrFail((int) $recipe);
         } else {
-            return;
+            abort(404);
         }
 
         $this->slug = $this->recipe->slug;
@@ -55,6 +59,8 @@ class Form extends Component
 
     public function save(): void
     {
+        $this->steps = trim($this->steps);
+
         $validated = $this->validate($this->rules(), $this->messages());
 
         $parameters = $this->decodeJsonArray($this->parametersJson, 'parametersJson');
@@ -66,7 +72,7 @@ class Form extends Component
             'risk_level' => $validated['risk_level'],
             'timeout_sec' => $validated['timeout_sec'],
             'parameters' => $parameters,
-            'steps' => trim($validated['steps']),
+            'steps' => $validated['steps'],
             'version' => $validated['version'],
             'is_active' => $validated['is_active'],
         ];

@@ -21,6 +21,42 @@ class CoreClient
         return $response;
     }
 
+    /**
+     * @return array{
+     *     ok: bool,
+     *     status: int|null,
+     *     body: array<string, mixed>|null,
+     *     error: string|null,
+     * }
+     */
+    public function execute(int $recipeId, int $targetId, array $params = []): array
+    {
+        try {
+            $response = $this->request()
+                ->post('/v1/execute', [
+                    'recipe_id' => $recipeId,
+                    'target_id' => $targetId,
+                    'params' => $params,
+                ]);
+
+            $body = $response->json();
+
+            return [
+                'ok' => $response->successful(),
+                'status' => $response->status(),
+                'body' => is_array($body) ? $body : null,
+                'error' => $response->successful() ? null : $response->body(),
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'ok' => false,
+                'status' => null,
+                'body' => null,
+                'error' => $exception->getMessage(),
+            ];
+        }
+    }
+
     protected function request(): PendingRequest
     {
         return Http::baseUrl((string) config('services.bastion_core.url'))

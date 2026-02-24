@@ -68,6 +68,30 @@ it('validates parameters as JSON when creating recipes', function (): void {
         ->assertHasErrors(['parametersJson']);
 });
 
+it('does not allow whitespace-only steps when creating recipes', function (): void {
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(RecipeForm::class)
+        ->set('slug', 'invalid-steps')
+        ->set('name', 'Invalid Steps')
+        ->set('description', 'Steps vacíos')
+        ->set('risk_level', 1)
+        ->set('timeout_sec', 120)
+        ->set('parametersJson', '{}')
+        ->set('steps', '   ')
+        ->set('version', '1.0.0')
+        ->set('is_active', true)
+        ->call('save')
+        ->assertHasErrors(['steps']);
+});
+
+it('returns not found for invalid recipe edit route parameter', function (): void {
+    $this->actingAs(User::factory()->create());
+
+    $this->get(route('recipes.edit', ['recipe' => 'invalid-id']))
+        ->assertNotFound();
+});
+
 it('allows activating and deactivating recipes', function (): void {
     $this->actingAs(User::factory()->create());
 

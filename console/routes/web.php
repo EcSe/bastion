@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Executions\Form as ExecutionForm;
+use App\Livewire\Executions\Index as ExecutionIndex;
 use App\Livewire\Recipes\Form as RecipeForm;
 use App\Livewire\Recipes\Index as RecipeIndex;
 use App\Livewire\Targets\Form as TargetForm;
@@ -20,6 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('recipes', RecipeIndex::class)->name('recipes.index');
     Route::livewire('recipes/create', RecipeForm::class)->name('recipes.create');
     Route::livewire('recipes/{recipe}/edit', RecipeForm::class)->name('recipes.edit');
+
+    Route::livewire('executions', ExecutionIndex::class)->name('executions.index');
+    Route::livewire('executions/create', ExecutionForm::class)->name('executions.create');
 });
 
 require __DIR__.'/settings.php';

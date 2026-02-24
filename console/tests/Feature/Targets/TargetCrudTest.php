@@ -60,6 +60,13 @@ it('validates auth_method specific fields for targets', function (): void {
         ->assertHasErrors(['secret_ref']);
 });
 
+it('returns not found for invalid target edit route parameter', function (): void {
+    $this->actingAs(User::factory()->create());
+
+    $this->get(route('targets.edit', ['target' => 'invalid-id']))
+        ->assertNotFound();
+});
+
 it('allows activating and deactivating targets', function (): void {
     $this->actingAs(User::factory()->create());
 

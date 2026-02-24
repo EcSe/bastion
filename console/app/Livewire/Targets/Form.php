@@ -32,12 +32,16 @@ class Form extends Component
 
     public function mount(mixed $target = null): void
     {
+        if ($target === null) {
+            return;
+        }
+
         if ($target instanceof Target) {
             $this->target = $target;
         } elseif (is_numeric($target)) {
             $this->target = Target::query()->findOrFail((int) $target);
         } else {
-            return;
+            abort(404);
         }
 
         $this->name = $this->target->name;

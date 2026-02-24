@@ -46,10 +46,14 @@
                                 {{ $recipe->is_active ? __('Activa') : __('Inactiva') }}
                             </td>
                             <td class="px-4 py-3">
-                                <div class="flex justify-end gap-2">
-                                    <flux:button size="sm" variant="ghost" :href="route('recipes.edit', $recipe)" wire:navigate>
-                                        {{ __('Editar') }}
-                                    </flux:button>
+                        <div class="flex justify-end gap-2">
+                            <flux:button size="sm" variant="ghost" :href="route('executions.create', ['recipe_id' => $recipe->id])" wire:navigate>
+                                {{ __('Ejecutar') }}
+                            </flux:button>
+
+                            <flux:button size="sm" variant="ghost" :href="route('recipes.edit', $recipe)" wire:navigate>
+                                {{ __('Editar') }}
+                            </flux:button>
 
                                     @if ($recipe->is_active)
                                         <flux:button size="sm" variant="subtle" wire:click="deactivate({{ $recipe->id }})">

@@ -21,6 +21,10 @@
                 <flux:navbar.item icon="book-open-text" :href="route('recipes.index')" :current="request()->routeIs('recipes.*')" wire:navigate>
                     {{ __('Recipes') }}
                 </flux:navbar.item>
+
+                <flux:navbar.item :href="route('executions.index')" :current="request()->routeIs('executions.*')" wire:navigate>
+                    {{ __('Ejecuciones') }}
+                </flux:navbar.item>
             </flux:navbar>
 
             <flux:spacer />
@@ -47,6 +51,10 @@
 
                     <flux:sidebar.item icon="book-open-text" :href="route('recipes.index')" :current="request()->routeIs('recipes.*')" wire:navigate>
                         {{ __('Recipes')  }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item :href="route('executions.index')" :current="request()->routeIs('executions.*')" wire:navigate>
+                        {{ __('Ejecuciones')  }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
