@@ -1,4 +1,5 @@
 import Fastify, { type FastifyInstance } from 'fastify';
+import { registerExecutionRoutes } from './routes/execute.js';
 import { registerHealthRoutes } from './routes/health.js';
 
 export interface AppDependencies {
@@ -18,6 +19,10 @@ export function buildApp(dependencies: AppDependencies): FastifyInstance {
 
       return Number(elapsedNanoseconds / 1000000000n);
     },
+  });
+
+  registerExecutionRoutes(app, {
+    coreToken: dependencies.coreToken,
   });
 
   return app;
