@@ -42,7 +42,7 @@ class Form extends Component
         $coreResponse = $coreClient->execute(
             $validated['recipe_id'],
             $validated['target_id'],
-            $params ?? [],
+            $params,
         );
 
         if (! $coreResponse['ok']) {

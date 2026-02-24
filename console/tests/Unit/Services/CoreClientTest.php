@@ -54,3 +54,31 @@ it('sends execute payload to the core execute endpoint', function (): void {
             && $request->data()['params']['branch'] === 'main';
     });
 });
+
+it('omits params from execute payload when params are null', function (): void {
+    config()->set('services.bastion_core.url', 'http://127.0.0.1:8787');
+    config()->set('services.bastion_core.token', 'unit-test-token');
+
+    Http::fake([
+        'http://127.0.0.1:8787/v1/execute' => Http::response([
+            'status' => 'queued',
+            'id' => 101,
+        ]),
+    ]);
+
+    $response = app(CoreClient::class)->execute(12, 34, null);
+
+    expect($response['ok'])->toBeTrue()
+        ->and($response['body']['status'])->toBe('queued');
+
+    Http::assertSent(function (Request $request): bool {
+        $payload = $request->data();
+
+        return $request->url() === 'http://127.0.0.1:8787/v1/execute'
+            && $request->method() === 'POST'
+            && $request->hasHeader('Authorization', 'Bearer unit-test-token')
+            && $payload['recipe_id'] === 12
+            && $payload['target_id'] === 34
+            && ! array_key_exists('params', $payload);
+    });
+});

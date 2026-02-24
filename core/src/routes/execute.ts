@@ -8,7 +8,7 @@ interface ExecutionRouteDependencies {
 interface ExecuteRequestBody {
   recipe_id: number;
   target_id: number;
-  params?: Record<string, unknown>;
+  params?: Record<string, unknown> | unknown[];
 }
 
 function isValidExecuteBody(body: unknown): body is ExecuteRequestBody {
@@ -33,7 +33,7 @@ function isValidExecuteBody(body: unknown): body is ExecuteRequestBody {
     return true;
   }
 
-  return typeof candidate.params === 'object' && !Array.isArray(candidate.params);
+  return typeof candidate.params === 'object';
 }
 
 export function registerExecutionRoutes(app: FastifyInstance, dependencies: ExecutionRouteDependencies): void {

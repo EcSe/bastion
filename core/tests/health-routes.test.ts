@@ -128,6 +128,30 @@ describe('health routes', () => {
     await app.close();
   });
 
+  it('accepts execute payload with params as array', async () => {
+    const app = buildApp({
+      coreToken: 'token',
+      checkDatabaseHealth: async () => true,
+    });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/execute',
+      headers: {
+        authorization: 'Bearer token',
+      },
+      payload: {
+        recipe_id: 1,
+        target_id: 2,
+        params: [],
+      },
+    });
+
+    expect(response.statusCode).toBe(202);
+
+    await app.close();
+  });
+
   it('returns validation error for malformed execute payload', async () => {
     const app = buildApp({
       coreToken: 'token',

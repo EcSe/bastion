@@ -29,15 +29,19 @@ class CoreClient
      *     error: string|null,
      * }
      */
-    public function execute(int $recipeId, int $targetId, array $params = []): array
+    public function execute(int $recipeId, int $targetId, ?array $params = null): array
     {
         try {
-            $response = $this->request()
-                ->post('/v1/execute', [
-                    'recipe_id' => $recipeId,
-                    'target_id' => $targetId,
-                    'params' => $params,
-                ]);
+            $payload = [
+                'recipe_id' => $recipeId,
+                'target_id' => $targetId,
+            ];
+
+            if ($params !== null) {
+                $payload['params'] = $params;
+            }
+
+            $response = $this->request()->post('/v1/execute', $payload);
 
             $body = $response->json();
 
